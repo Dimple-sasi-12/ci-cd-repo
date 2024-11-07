@@ -45,7 +45,7 @@ pipeline {
         stage('docker container') {
             steps {
              script {
-               sh 'docker run -itd -p 8089:8090 img2'
+               sh 'docker run -itd -p 8090:8090 img2'
              }
             }
         }    
