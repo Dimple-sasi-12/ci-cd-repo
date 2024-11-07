@@ -38,14 +38,14 @@ pipeline {
          stage('docker build') {
             steps {
              script {
-                 sh 'docker build -t img .'
+                 sh 'docker build -t img1 .'
             }
           }
         }
         stage('docker container') {
             steps {
              script {
-               sh 'docker run -itd --name ci-cd-container -p 8086:8083 img'
+               sh 'docker run -itd --name ci-cd1-container -p 8086:8083 img'
              }
             }
         }    
