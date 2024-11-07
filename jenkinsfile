@@ -38,29 +38,23 @@ pipeline {
          stage('docker build') {
             steps {
              script {
-                 withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                    sh 'docker build -t java-spring .'
-                  }
-              }
+                 sh 'docker build -t java-spring .'
+           }
             }
         }
          stage('docker push') {
             steps {
              script {
-                withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                    sh 'docker tag java-spring sushmagowda321/java-spring'
+               sh 'docker tag java-spring sushmagowda321/java-spring'
                     sh 'docker push sushmagowda321/java-spring'
-                  }
               }
             }
          }    
         stage('docker container') {
             steps {
              script {
-                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                    sh 'docker run -itd --name ci-cd-container -p 8085:8081 java-spring'
-                  }
-              }
+               sh 'docker run -itd --name ci-cd-container -p 8085:8081 java-spring'
+             }
             }
         }    
     }	
@@ -68,7 +62,7 @@ pipeline {
     post {
         always {
             echo 'slack Notification.'
-            slackSend channel: '#ci-cd-pipeline',
+            slackSend channel: '#dev-team',
             color: COLOR_MAP [currentBuild.currentResult],
             message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${env.BUILD_URl}"
             
