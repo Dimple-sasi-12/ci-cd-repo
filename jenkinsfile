@@ -38,14 +38,14 @@ pipeline {
          stage('docker build') {
             steps {
              script {
-                 sh 'docker build -t img3 .'
+                 sh 'docker build -t img .'
             }
           }
         }
         stage('docker container') {
             steps {
              script {
-               sh 'docker run -itd -p 8091:8000 img3'
+               sh 'docker run -itd -p 8092:8000 img'
              }
             }
         }    
