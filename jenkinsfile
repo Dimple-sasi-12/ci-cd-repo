@@ -45,8 +45,10 @@ pipeline {
           stage('docker push') {
             steps {
              script {
+                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
                     sh 'docker tag img bunny2003/java-spring'
                     sh 'docker push bunny2003/java-spring'
+                    }
                   }
                 }
               }
