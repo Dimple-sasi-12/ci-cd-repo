@@ -3,56 +3,60 @@ pipeline {
     tools {
         maven 'maven'
     }
-     environment {
+    environment {
         SCANNER_HOME = tool 'sonarqube'
-     }
+        COLOR_MAP = ["SUCCESS": "good", "FAILURE": "danger", "UNSTABLE": "warning"]
+    }
     stages {
-        stage('git checkout') {
+        stage('Git Checkout') {
             steps {
-             git 'https://github.com/Dimple-sasi-12/ci-cd-repo.git'
+                git 'https://github.com/Dimple-sasi-12/ci-cd-repo.git'
             }
         }
-         stage('compile') {
+        stage('Compile') {
             steps {
-              sh 'mvn compile'
+                sh 'mvn compile'
             }
         }
-          stage('code analysis') {
+        stage('Code Analysis') {
             steps {
-              withSonarQubeEnv('sonar-server') {
-               sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Java-Springboot \
-               -Dsonar.java.binaries=. \
-               -Dsonar.projectKey=Java-Springboot'''
-              }
+                withSonarQubeEnv('sonarqube') { // Replace 'sonar-server' with your configured SonarQube server name
+                    sh '''
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=Java-Springboot \
+                        -Dsonar.java.binaries=target/classes \
+                        -Dsonar.projectKey=Java-Springboot
+                    '''
+                }
             }
         }
-        stage('package') {
+        stage('Package') {
             steps {
-              sh 'mvn install'
+                sh 'mvn install'
             }
         }
-         stage('docker build') {
+        stage('Docker Build') {
             steps {
-             script {
-                 sh 'docker build -t java-img .'
+                script {
+                    sh 'docker build -t java-img .'
+                }
             }
-          }
-          }
-         stage('docker container') {
+        }
+        stage('Run Docker Container') {
             steps {
-             script {
-               sh 'docker run -itd -p 8082:8000 java-img'
-             }
+                script {
+                    sh 'docker run -itd -p 8082:8000 java-img'
+                }
             }
         }
     }
     post {
         always {
-            echo 'slack Notification.'
+            echo 'Sending Slack Notification.'
             slackSend channel: '#dev',
-            color: COLOR_MAP [currentBuild.currentResult],
-            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${env.BUILD_URl}"
-
+            color: COLOR_MAP[currentBuild.currentResult],
+            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \nMore info at: ${env.BUILD_URL}"
         }
     }
 }
+
